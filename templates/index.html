@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Todo App</title>
+</head>
+<body>
+    
+    <h1>My Todo App</h1>
+    <p>My first webpage served using Go!</p>
+
+    {{range .}}
+    <p>
+        ID: {{.ID}} |
+        Title: {{.Title}} |
+        Completed: {{.Completed}}
+    </p>
+    {{end}}
+
+</body>
+</html>
