@@ -27,6 +27,7 @@ var todos = []Todo{
 	},
 }
 
+// Home handler
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
@@ -40,6 +41,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Create
 func createTodoHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 
@@ -54,6 +56,7 @@ func createTodoHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// Delete
 func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 	idString := r.FormValue("id")
 	id, err := strconv.Atoi(idString)
@@ -63,17 +66,61 @@ func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for i, todo := range todos {
 		if todo.ID == id {
-
+			todos = append(todos[:i], todos[i+1:]...)
+			break
 		}
 	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// Update
+func updateTodoHandler(w http.ResponseWriter, r *http.Request) {
+	idString := r.FormValue("id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		http.Error(w, "Invalid Todo ID", http.StatusBadRequest)
+		return
+	}
+	for i, todo := range todos {
+		if todo.ID == id {
+			todos[i].Completed = !todo.Completed
+			break
+		}
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Edit
+func editTodoHandler(w http.ResponseWriter, r *http.Request) {
+	idString := r.FormValue("id")
+	id, err := strconv.Atoi(idString)
+
+	if err != nil {
+		http.Error(w, "Invalid Todo ID", http.StatusBadRequest)
+		return
+	}
+
+	newTitle := r.FormValue("title")
+
+	for i, todo := range todos {
+		if todo.ID == id {
+			todos[i].Title = newTitle
+			break
+		}
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Main function
 func main() {
 	http.HandleFunc("/", homeHandler)
 
 	fmt.Println("Server is running at http://localhost:8080")
 
 	http.HandleFunc("/todos/create", createTodoHandler)
+	http.HandleFunc("/todos/delete", deleteTodoHandler)
+	http.HandleFunc("/todos/update", updateTodoHandler)
+	http.HandleFunc("/todos/edit", editTodoHandler)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {

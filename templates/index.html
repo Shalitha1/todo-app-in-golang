@@ -25,6 +25,30 @@
         <input type="hidden" name="id" value="{{.ID}}">
         <button type="submit">Delete</button>
         </form>
+
+
+        <form action="/todos/update" method="POST">
+        <input type="hidden" name="id" value="{{.ID}}">
+        <button type="submit">
+            Toggle Completed
+        </button>
+        </form>
+
+
+        <form action="/todos/edit" method="POST">
+        <input type="hidden" name="id" value="{{.ID}}">
+
+        <input
+            type="text"
+            name="title"
+            value="{{.Title}}"
+            required
+        >
+
+        <button type="submit">Save Title</button>
+        </form>
+
+
     </p>
     {{end}}
 
