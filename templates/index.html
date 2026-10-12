@@ -6,15 +6,25 @@
     <title>My Todo App</title>
 </head>
 <body>
-    
+
     <h1>My Todo App</h1>
     <p>My first webpage served using Go!</p>
+
+    <form action="/todos/create" method="POST">
+        <input type="text" name="title" placeholder="Enter a todo" required>
+        <button type="submit">Add Todo</button>
+    </form>
 
     {{range .}}
     <p>
         ID: {{.ID}} |
         Title: {{.Title}} |
         Completed: {{.Completed}}
+
+        <form action="/todos/delete" method="POST">
+        <input type="hidden" name="id" value="{{.ID}}">
+        <button type="submit">Delete</button>
+        </form>
     </p>
     {{end}}
 

@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Todo struct {
@@ -39,10 +40,40 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createTodoHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.FormValue("title")
+
+	newTodo := Todo{
+		ID:        len(todos) + 1,
+		Title:     title,
+		Completed: false,
+	}
+
+	todos = append(todos, newTodo)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func deleteTodoHandler(w http.ResponseWriter, r *http.Request) {
+	idString := r.FormValue("id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		http.Error(w, "Invalid Todo ID", http.StatusBadRequest)
+		return
+	}
+	for i, todo := range todos {
+		if todo.ID == id {
+
+		}
+	}
+}
+
 func main() {
 	http.HandleFunc("/", homeHandler)
 
 	fmt.Println("Server is running at http://localhost:8080")
+
+	http.HandleFunc("/todos/create", createTodoHandler)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
