@@ -9,16 +9,48 @@ import (
 )
 
 // Home handler
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Query(
+		"SELECT id, title, completed FROM todos ORDER BY id",
+	)
+	if err != nil {
+		http.Error(w, "Could not load todos", http.StatusInternalServerError)
+		log.Println("Query error:", err)
+		return
+	}
+	defer rows.Close()
+
+	var todos []Todo
+
+	for rows.Next() {
+		var todo Todo
+
+		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed)
+		if err != nil {
+			http.Error(w, "Could not read todos", http.StatusInternalServerError)
+			log.Println("Scan error:", err)
+			return
+		}
+
+		todos = append(todos, todo)
+	}
+
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Could not read todos", http.StatusInternalServerError)
+		log.Println("Rows error:", err)
+		return
+	}
+
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		http.Error(w, "Could not load webpage", http.StatusInternalServerError)
-		log.Print(err)
+		log.Println(err)
 		return
 	}
-	err = tmpl.Execute(w, todos)
-	if err != nil {
-		log.Println(err)
+
+	if err := tmpl.Execute(w, todos); err != nil {
+		log.Println("Template error:", err)
 	}
 }
 

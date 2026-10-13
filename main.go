@@ -2,11 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 // Main function
 func main() {
+
+	if err := initDB(); err != nil {
+		log.Fatal("Database connection failed: ", err)
+	}
+	defer db.Close()
+
 	http.HandleFunc("/", homeHandler)
 
 	fmt.Println("Server is running at http://localhost:8080")
